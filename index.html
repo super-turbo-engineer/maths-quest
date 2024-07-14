@@ -9,7 +9,7 @@
     <!--meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com"-->
     <style>
         body {
-            font-family: 'Chivo', sans-serif; /* Use Chivo font */
+            font-family: 'Chivo', sans-serif;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -20,17 +20,15 @@
         }
 
         .top-bar {
-            font-family: 'Chivo', sans-serif; /* Use Chivo font */
             display: flex;
             justify-content: space-between;
             align-items: center;
-            width: 655px; /* Adjusted width */
-            padding: 20px 15px; /* Adjusted padding */
+            width: 655px;
+            padding: 20px 15px;
             background-color: #333;
             color: white;
-            margin-top: 20px; /* Adjusted margin */
+            margin-top: 20px; 
             box-sizing: border-box;
-            z-index: 3; /* Ensure it stays above the overlay */
         }
 
         .high-score, .timer {
@@ -38,7 +36,6 @@
         }
 
         #startStopButton {
-            font-family: 'Chivo', sans-serif; /* Use Chivo font */
             padding: 10px 20px;
             font-size: 1em;
             border: none;
@@ -46,7 +43,7 @@
             color: white;
             border-radius: 5px;
             cursor: pointer;
-            width: 100px; /* Fixed width */
+            width: 100px;
         }
 
         #startStopButton:hover {
@@ -54,7 +51,6 @@
         }
 
         .login-button {
-            font-family: 'Chivo', sans-serif; /* Use Chivo font */
             padding: 10px 20px;
             font-size: 1em;
             border: none;
@@ -70,16 +66,14 @@
         }
 
         .grid-container {
-            font-family: 'Chivo', sans-serif; /* Use Chivo font */
             display: grid;
             grid-template-columns: repeat(12, 50px);
             grid-template-rows: repeat(12, 50px);
             gap: 5px;
             position: relative;
             z-index: 1;
-            opacity: 0.7; /* Adjusted opacity */
-            margin-top: 20px; /* Added margin-top to space it from the top bar */
-            position: relative; /* Ensure relative positioning */
+            opacity: 0.7;
+            margin-top: 20px;
         }
 
         .indicator {
@@ -104,7 +98,6 @@
         }
 
         .overlay {
-            font-family: 'Chivo', sans-serif; /* Use Chivo font */
             position: absolute;
             z-index: 2;
             background-color: rgba(255, 255, 255, 0.8);
@@ -114,8 +107,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            top: 50%; /* Center vertically */
-            left: 50%; /* Center horizontally */
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
             visibility: hidden; /* Initially hidden */
         }
@@ -124,7 +117,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding-top: 10px; /* Added padding-top to space it from the top */
+            padding-top: 10px;
             flex-grow: 1;
         }
 
@@ -139,7 +132,6 @@
         }
 
         .answer-input {
-            font-family: 'Chivo', sans-serif; /* Use Chivo font */
             font-size: 1.5em;
             padding: 10px;
             border: 2px solid #ccc;
@@ -180,13 +172,13 @@
             const gridItems = document.querySelectorAll('.indicator');
 
             if (timerRunning) {
-                clearInterval(timer);
+                resetGrid();
                 startStopButton.textContent = 'Start';
+                clearInterval(timer);
                 timerRunning = false;
                 time = 0;
                 document.getElementById('timer').textContent = time.toFixed(2);
-                document.querySelector('.overlay').style.visibility = 'hidden'; // Hide overlay
-                resetGrid(); // Reset grid
+                document.querySelector('.overlay').style.visibility = 'hidden';
             } else {
                 resetGrid();
                 startStopButton.textContent = 'Give Up';
@@ -195,9 +187,10 @@
                     document.getElementById('timer').textContent = time.toFixed(2);
                 }, 10);
                 timerRunning = true;
+                time = 0;
                 shuffledQuestions = shuffleQuestions();
                 generateEquation();
-                document.querySelector('.overlay').style.visibility = 'visible'; // Show overlay
+                document.querySelector('.overlay').style.visibility = 'visible';
                 document.getElementById('answerInput').focus(); // Set focus to answer input
             }
         }

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12x12 Grid Game with Chivo Font</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&display=swap">
+    <style>
+        body {
+            font-family: 'Chivo', sans-serif; /* Use Chivo font */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .top-bar {
+            font-family: 'Chivo', sans-serif; /* Use Chivo font */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 655px; /* Adjusted width */
+            padding: 20px 15px; /* Adjusted padding */
+            background-color: #333;
+            color: white;
+            margin-top: 20px; /* Adjusted margin */
+            box-sizing: border-box;
+            z-index: 3; /* Ensure it stays above the overlay */
+        }
+
+        .high-score, .timer {
+            font-size: 1.2em;
+        }
+
+        #startStopButton {
+            font-family: 'Chivo', sans-serif; /* Use Chivo font */
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100px; /* Fixed width */
+        }
+
+        #startStopButton:hover {
+            background-color: #0056b3;
+        }
+
+        .grid-container {
+            font-family: 'Chivo', sans-serif; /* Use Chivo font */
+            display: grid;
+            grid-template-columns: repeat(12, 50px);
+            grid-template-rows: repeat(12, 50px);
+            gap: 5px;
+            position: relative;
+            z-index: 1;
+            opacity: 0.7; /* Adjusted opacity */
+            margin-top: 20px; /* Added margin-top to space it from the top bar */
+            position: relative; /* Ensure relative positioning */
+        }
+
+        .indicator {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .unset {
+            background-color: grey;
+        }
+
+        .success {
+            background-color: green;
+        }
+
+        .failure {
+            background-color: red;
+        }
+
+        .overlay {
+            font-family: 'Chivo', sans-serif; /* Use Chivo font */
+            position: absolute;
+            z-index: 2;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%);
+            visibility: hidden; /* Initially hidden */
+        }
+
+        .equation-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 10px; /* Added padding-top to space it from the top */
+            flex-grow: 1;
+        }
+
+        .equation {
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+        }
+
+        .question {
+            margin-right: 10px;
+        }
+
+        .answer-input {
+            font-family: 'Chivo', sans-serif; /* Use Chivo font */
+            font-size: 1.5em;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            width: 100px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="high-score">High Score: <span id="highScore">0</span></div>
+        <div class="timer">Time: <span id="timer">0.00</span>s</div>
+        <button id="startStopButton" onclick="startStop()">Start</button>
+    </div>
+    <div class="grid-container" id="gridContainer">
+        <!-- Grid indicators will be generated here by JavaScript -->
+        <div class="overlay">
+            <div class="equation-container">
+                <div class="equation">
+                    <span class="question" id="question">5 x 6 = </span>
+                    <input type="text" class="answer-input" id="answerInput" onkeypress="checkAnswer(event)">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let timer;
+        let timerRunning = false;
+        let time = 0;
+        let shuffledQuestions = [];
+        let currentEquation = {};
+        let highScore = 0;
+
+        function startStop() {
+            const startStopButton = document.getElementById('startStopButton');
+            const gridItems = document.querySelectorAll('.indicator');
+
+            if (timerRunning) {
+                clearInterval(timer);
+                startStopButton.textContent = 'Start';
+                timerRunning = false;
+                time = 0;
+                document.getElementById('timer').textContent = time.toFixed(2);
+                document.querySelector('.overlay').style.visibility = 'hidden'; // Hide overlay
+                resetGrid(); // Reset grid
+            } else {
+                resetGrid();
+                startStopButton.textContent = 'Stop';
+                timer = setInterval(() => {
+                    time += 0.01;
+                    document.getElementById('timer').textContent = time.toFixed(2);
+                }, 10);
+                timerRunning = true;
+                shuffledQuestions = shuffleQuestions();
+                generateEquation();
+                document.querySelector('.overlay').style.visibility = 'visible'; // Show overlay
+            }
+        }
+
+        function resetGrid() {
+            const gridItems = document.querySelectorAll('.indicator');
+            gridItems.forEach(item => {
+                item.classList.remove('success', 'failure');
+                item.classList.add('unset');
+            });
+            highScore = 0;
+            document.getElementById('highScore').textContent = highScore;
+        }
+
+        function shuffleQuestions() {
+            let questions = [];
+            for (let i = 1; i <= 12; i++) {
+                for (let j = 1; j <= 12; j++) {
+                    questions.push({ num1: i, num2: j, answer: i * j });
+                }
+            }
+            shuffleArray(questions);
+            return questions;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function generateEquation() {
+            if (shuffledQuestions.length > 0) {
+                currentEquation = shuffledQuestions.pop();
+                document.getElementById('question').textContent = `${currentEquation.num1} x ${currentEquation.num2} = `;
+                document.getElementById('answerInput').value = '';
+                document.getElementById('answerInput').focus();
+            } else {
+                clearInterval(timer);
+                alert(`Congratulations! You completed the game in ${time.toFixed(2)} seconds.`);
+            }
+        }
+
+        function checkAnswer(event) {
+            if (event.key === 'Enter') {
+                const userAnswer = parseInt(event.target.value);
+                const index = (currentEquation.num1 - 1) * 12 + (currentEquation.num2 - 1);
+                const gridItems = document.querySelectorAll('.indicator');
+
+                if (userAnswer === currentEquation.answer) {
+                    gridItems[index].classList.remove('unset', 'failure');
+                    gridItems[index].classList.add('success');
+                    highScore++;
+                    document.getElementById('highScore').textContent = highScore;
+                } else {
+                    gridItems[index].classList.remove('unset', 'success');
+                    gridItems[index].classList.add('failure');
+                }
+
+                generateEquation();
+            }
+        }
+
+        // Generate the grid on page load
+        window.onload = createGrid;
+
+        function createGrid() {
+            const gridContainer = document.getElementById('gridContainer');
+            for (let i = 0; i < 144; i++) {
+                const div = document.createElement('div');
+                div.classList.add('indicator', 'unset');
+                gridContainer.appendChild(div);
+            }
+        }
+    </script>
+</body>
+</html>

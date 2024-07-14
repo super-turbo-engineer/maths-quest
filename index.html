@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maths Quest - times tables</title>
+    <title>Maths Quest - learn your times tables!</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&display=swap">
+    <!--script src="https://apis.google.com/js/platform.js" async defer></script-->
+    <!--meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com"-->
     <style>
         body {
             font-family: 'Chivo', sans-serif; /* Use Chivo font */
@@ -14,7 +16,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            background-color: #4c5351;
         }
 
         .top-bar {
@@ -49,6 +51,22 @@
 
         #startStopButton:hover {
             background-color: #0056b3;
+        }
+
+        .login-button {
+            font-family: 'Chivo', sans-serif; /* Use Chivo font */
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            background-color: #db4437;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .login-button:hover {
+            background-color: #c23321;
         }
 
         .grid-container {
@@ -148,6 +166,7 @@
             </div>
         </div>
     </div>
+    <!--button class="login-button" onclick="signInWithGoogle()">Login with Google</button-->
     <script>
         let timer;
         let timerRunning = false;
@@ -170,7 +189,7 @@
                 resetGrid(); // Reset grid
             } else {
                 resetGrid();
-                startStopButton.textContent = 'Stop';
+                startStopButton.textContent = 'Give Up';
                 timer = setInterval(() => {
                     time += 0.01;
                     document.getElementById('timer').textContent = time.toFixed(2);
@@ -179,6 +198,7 @@
                 shuffledQuestions = shuffleQuestions();
                 generateEquation();
                 document.querySelector('.overlay').style.visibility = 'visible'; // Show overlay
+                document.getElementById('answerInput').focus(); // Set focus to answer input
             }
         }
 
@@ -216,7 +236,7 @@
                 currentEquation = shuffledQuestions.pop();
                 document.getElementById('question').textContent = `${currentEquation.num1} x ${currentEquation.num2} = `;
                 document.getElementById('answerInput').value = '';
-                document.getElementById('answerInput').focus();
+                document.getElementById('answerInput').focus(); // Set focus to answer input
             } else {
                 clearInterval(timer);
                 alert(`Congratulations! You completed the game in ${time.toFixed(2)} seconds.`);
@@ -243,16 +263,27 @@
             }
         }
 
-        // Generate the grid on page load
-        window.onload = createGrid;
-
         function createGrid() {
             const gridContainer = document.getElementById('gridContainer');
             for (let i = 0; i < 144; i++) {
-                const div = document.createElement('div');
-                div.classList.add('indicator', 'unset');
-                gridContainer.appendChild(div);
+                const gridItem = document.createElement('div');
+                gridItem.classList.add('indicator', 'unset');
+                gridContainer.appendChild(gridItem);
             }
+        }
+
+        function signInWithGoogle() {
+            gapi.auth2.getAuthInstance().signIn().then(function (googleUser) {
+                const profile = googleUser.getBasicProfile();
+                console.log('ID: ' + profile.getId());
+                console.log('Name: ' + profile.getName());
+                console.log('Image URL: ' + profile.getImageUrl());
+                console.log('Email: ' + profile.getEmail());
+            });
+        }
+
+        window.onload = function() {
+            createGrid();
         }
     </script>
 </body>

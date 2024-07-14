@@ -158,7 +158,24 @@
             </div>
         </div>
     </div>
-    <button class="login-button" onclick="signInWithGoogle()">Login with Google</button>
+    <div id="g_id_onload"
+         data-client_id="389912888950-7nmu93aokk6i3tl2khcm29e4bivst2bn.apps.googleusercontent.com"
+         data-context="signin"
+         data-ux_mode="popup"
+         data-callback="loginCallback"
+         data-nonce=""
+         data-auto_select="true"
+         data-itp_support="true">
+    </div>
+    
+    <div class="g_id_signin"
+         data-type="standard"
+         data-shape="rectangular"
+         data-theme="filled_blue"
+         data-text="signin_with"
+         data-size="large"
+         data-logo_alignment="left">
+    </div>
     <script>
         let timer;
         let timerRunning = false;
@@ -263,16 +280,6 @@
                 gridItem.classList.add('indicator', 'unset');
                 gridContainer.appendChild(gridItem);
             }
-        }
-
-        function signInWithGoogle() {
-            gapi.auth2.getAuthInstance().signIn().then(function (googleUser) {
-                const profile = googleUser.getBasicProfile();
-                console.log('ID: ' + profile.getId());
-                console.log('Name: ' + profile.getName());
-                console.log('Image URL: ' + profile.getImageUrl());
-                console.log('Email: ' + profile.getEmail());
-            });
         }
 
         window.onload = function() {

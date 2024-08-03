@@ -5,40 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maths Quest - learn your times tables!</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&display=swap">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <meta name="google-signin-client_id" content="389912888950-7nmu93aokk6i3tl2khcm29e4bivst2bn.apps.googleusercontent.com">
     <style>
         body {
             font-family: 'Chivo', sans-serif;
-            background-color: #4c5351;
-            color: #fff;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: flex-start;
+            align-items: center;
             height: 100vh;
             margin: 0;
+            background-color: #4c5351;
         }
 
         .top-bar {
-            width: 655px;
-            padding: 20px 15px;
-            margin-top: 20px;
-            background-color: #333;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 655px;
+            padding: 20px 15px;
+            background-color: #333;
+            color: white;
+            margin-top: 20px; 
+            box-sizing: border-box;
+        }
+
+        .high-score, .timer {
+            font-size: 1.2em;
+        }
+
+        #startStopButton {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100px;
+        }
+
+        #startStopButton:hover {
+            background-color: #0056b3;
         }
 
         .grid-container {
             display: grid;
+            grid-template-columns: repeat(12, 50px);
+            grid-template-rows: repeat(12, 50px);
             gap: 5px;
-            margin: 20px 0;
             position: relative;
+            z-index: 1;
+            opacity: 0.7;
+            margin-top: 20px;
         }
 
         .indicator {
             width: 50px;
             height: 50px;
-            background-color: grey;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .unset {
@@ -55,77 +84,56 @@
 
         .overlay {
             position: absolute;
+            z-index: 2;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            visibility: hidden;
+            visibility: hidden; /* Initially hidden */
         }
 
         .equation-container {
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
         }
 
         .equation {
-            font-size: 2rem;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
         }
 
-        .answer-input {
-            font-size: 2rem;
-            width: 100px;
-            text-align: center;
-        }
-
-        #startStopButton {
-            width: 100px;
+        .question {
             margin-right: 10px;
         }
 
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #333;
-            min-width: 100px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-        }
-
-        .dropdown-content a {
-            color: white;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #575757;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
+        .answer-input {
+            font-size: 1.5em;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            width: 100px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="top-bar">
-        <span>High Score: <span id="highScore">0</span></span>
-        <span>Timer: <span id="timer">0.00</span></span>
-        <div class="dropdown">
-            <button id="startStopButton" onclick="startStop()">Start</button>
-            <div class="dropdown-content">
-                <a href="#" onclick="setGridSize(5, 5)">5x5</a>
-                <a href="#" onclick="setGridSize(10, 10)">10x10</a>
-                <a href="#" onclick="setGridSize(12, 12)">12x12</a>
-            </div>
-        </div>
+        <div class="high-score">High Score: <span id="highScore">0</span></div>
+        <div class="timer">Time: <span id="timer">0.00</span>s</div>
+        <button id="startStopButton" onclick="startStop()">Start</button>
     </div>
     <div class="grid-container" id="gridContainer">
         <!-- Grid indicators will be generated here by JavaScript -->
-        <div class="overlay" id="overlay">
+        <div class="overlay">
             <div class="equation-container">
                 <div class="equation">
                     <span class="question" id="question">5 x 6 = </span>
@@ -134,53 +142,73 @@
             </div>
         </div>
     </div>
-    <button class="login-button" onclick="signInWithGoogle()">Login with Google</button>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <div id="g_id_onload"
+         data-client_id="389912888950-7nmu93aokk6i3tl2khcm29e4bivst2bn.apps.googleusercontent.com"
+         data-context="signin"
+         data-ux_mode="popup"
+         data-callback="loginCallback"
+         data-nonce=""
+         data-auto_select="true"
+         data-itp_support="true">
+    </div>
+    <div class="g_id_signin"
+         data-type="standard"
+         data-shape="rectangular"
+         data-theme="filled_black"
+         data-text="signin_with"
+         data-size="large"
+         data-logo_alignment="left">
+    </div>
     <script>
-        let gridSize = 12;
-        let highScore = 0;
         let timer;
-        let time = 0;
         let timerRunning = false;
+        let time = 0;
         let shuffledQuestions = [];
-        let currentEquation;
-        
-        function setGridSize(rows, cols) {
-            gridSize = rows;
-            document.getElementById('gridContainer').style.gridTemplateColumns = `repeat(${cols}, 50px)`;
-            document.getElementById('gridContainer').style.gridTemplateRows = `repeat(${rows}, 50px)`;
-            createGrid(rows, cols);
-        }
+        let currentEquation = {};
+        let highScore = 0;
 
         function startStop() {
             const startStopButton = document.getElementById('startStopButton');
+            const gridItems = document.querySelectorAll('.indicator');
 
             if (timerRunning) {
-                clearInterval(timer);
+                resetGrid();
                 startStopButton.textContent = 'Start';
+                clearInterval(timer);
                 timerRunning = false;
                 time = 0;
                 document.getElementById('timer').textContent = time.toFixed(2);
                 document.querySelector('.overlay').style.visibility = 'hidden';
-                resetGrid();
             } else {
-                shuffledQuestions = shuffleQuestions(gridSize);
-                generateEquation();
-                startStopButton.textContent = 'Give up';
-                document.querySelector('.overlay').style.visibility = 'visible';
-                document.getElementById('answerInput').focus();
-                timerRunning = true;
+                resetGrid();
+                startStopButton.textContent = 'Give Up';
                 timer = setInterval(() => {
                     time += 0.01;
                     document.getElementById('timer').textContent = time.toFixed(2);
                 }, 10);
+                timerRunning = true;
+                time = 0;
+                shuffledQuestions = shuffleQuestions();
+                generateEquation();
+                document.querySelector('.overlay').style.visibility = 'visible';
+                document.getElementById('answerInput').focus(); // Set focus to answer input
             }
         }
 
-        function shuffleQuestions(size) {
+        function resetGrid() {
+            const gridItems = document.querySelectorAll('.indicator');
+            gridItems.forEach(item => {
+                item.classList.remove('success', 'failure');
+                item.classList.add('unset');
+            });
+            highScore = 0;
+            document.getElementById('highScore').textContent = highScore;
+        }
+
+        function shuffleQuestions() {
             let questions = [];
-            for (let i = 1; i <= size; i++) {
-                for (let j = 1; j <= size; j++) {
+            for (let i = 1; i <= 12; i++) {
+                for (let j = 1; j <= 12; j++) {
                     questions.push({ num1: i, num2: j, answer: i * j });
                 }
             }
@@ -201,16 +229,17 @@
                 currentEquation = shuffledQuestions.pop();
                 document.getElementById('question').textContent = `${currentEquation.num1} x ${currentEquation.num2} = `;
                 document.getElementById('answerInput').value = '';
-                document.getElementById('answerInput').focus();
+                document.getElementById('answerInput').focus(); // Set focus to answer input
             } else {
-                finalizeGame();
+                clearInterval(timer);
+                alert(`Congratulations! You completed the game in ${time.toFixed(2)} seconds.`);
             }
         }
 
         function checkAnswer(event) {
             if (event.key === 'Enter') {
                 const userAnswer = parseInt(event.target.value);
-                const index = (currentEquation.num1 - 1) * gridSize + (currentEquation.num2 - 1);
+                const index = (currentEquation.num1 - 1) * 12 + (currentEquation.num2 - 1);
                 const gridItems = document.querySelectorAll('.indicator');
 
                 if (userAnswer === currentEquation.answer) {
@@ -222,60 +251,27 @@
                     gridItems[index].classList.remove('unset', 'success');
                     gridItems[index].classList.add('failure');
                 }
-                if (shuffledQuestions.length > 0) {
-                    generateEquation();
-                } else {
-                    finalizeGame();
-                }
+
+                generateEquation();
             }
         }
 
-        function finalizeGame() {
-            document.querySelector('.overlay').style.visibility = 'hidden';
-            clearInterval(timer);
-            updateScore();
-            alert(`Congratulations! You completed the game in ${time.toFixed(2)} seconds.`);
-            document.getElementById('startStopButton').textContent = 'Try again';
-        }
-
-        function updateScore() {
-            if (highScore > parseInt(document.getElementById('highScore').textContent)) {
-                document.getElementById('highScore').textContent = highScore;
-            }
-        }
-
-        function createGrid(rows, cols) {
+        function createGrid() {
             const gridContainer = document.getElementById('gridContainer');
-            gridContainer.innerHTML = '';
-            for (let i = 0; i < rows * cols; i++) {
+            for (let i = 0; i < 144; i++) {
                 const gridItem = document.createElement('div');
                 gridItem.classList.add('indicator', 'unset');
                 gridContainer.appendChild(gridItem);
             }
         }
 
-        function resetGrid() {
-            const gridItems = document.querySelectorAll('.indicator');
-            gridItems.forEach(item => {
-                item.classList.remove('success', 'failure');
-                item.classList.add('unset');
-            });
+        function loginCallback() {
+            alert("hello world");
         }
 
-        function signInWithGoogle() {
-            gapi.auth2.getAuthInstance().signIn().then(function (googleUser) {
-                const profile = googleUser.getBasicProfile();
-                console.log('ID: ' + profile.getId());
-                console.log('Name: ' + profile.getName());
-                console.log('Image URL: ' + profile.getImageUrl());
-                console.log('Email: ' + profile.getEmail());
-            });
+        window.onload = function() {
+            createGrid();
         }
-
-        // Set default grid size to 12x12 on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            setGridSize(12, 12);
-        });
     </script>
 </body>
 </html>

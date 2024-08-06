@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maths Quest - learn your times tables!</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/@tsparticles/confetti@3.0.3/tsparticles.confetti.bundle.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <meta name="google-signin-client_id" content="389912888950-7nmu93aokk6i3tl2khcm29e4bivst2bn.apps.googleusercontent.com">
     <style>
@@ -224,6 +225,32 @@
             return array;
         }
 
+        const defaults = {
+          spread: 360,
+          ticks: 50,
+          gravity: 0,
+          decay: 0.94,
+          startVelocity: 30,
+          shapes: ["star"],
+          colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
+        };
+        
+        function shoot() {
+          confetti({
+            ...defaults,
+            particleCount: 40,
+            scalar: 1.2,
+            shapes: ["star"],
+          });
+        
+          confetti({
+            ...defaults,
+            particleCount: 10,
+            scalar: 0.75,
+            shapes: ["circle"],
+          });
+        }
+        
         function generateEquation() {
             if (shuffledQuestions.length > 0) {
                 currentEquation = shuffledQuestions.pop();
@@ -232,6 +259,16 @@
                 document.getElementById('answerInput').focus(); // Set focus to answer input
             } else {
                 clearInterval(timer);
+                setTimeout(shoot, 0);
+                setTimeout(shoot, 50);
+                setTimeout(shoot, 100);
+                setTimeout(shoot, 150);
+                setTimeout(shoot, 200);
+                setTimeout(shoot, 250);
+                setTimeout(shoot, 300);
+                setTimeout(shoot, 350);
+                setTimeout(shoot, 400);
+                setTimeout(shoot, 450);
                 alert(`Congratulations! You completed the game in ${time.toFixed(2)} seconds.`);
             }
         }
